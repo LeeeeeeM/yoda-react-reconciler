@@ -3,21 +3,28 @@ import ReactReconciler from "react-reconciler";
 import "./polyfill";
 
 export const HOST_TAG = {
-  NODE: "Node",
-  TEXT: "Text",
+  NODE: "NODE",
+  TEXT: "TEXT",
 };
 
 // 您的宿主环境 API 实现
 const hostEnvironment = {
   // 必须实现的 DOM 操作方法
-  createNode: (type, text) => {
-    if (type === HOST_TAG.TEXT) {
-      console.warn(`暂时不支持文本节点, 内容为${text}`);
-    }
+  createNode: (type) => {
     if (type !== HOST_TAG.NODE) {
       console.warn(`暂时不支持${type}类型，使用${HOST_TAG.NODE}替代`);
     }
-    return createNode();
+    return createNode(HOST_TAG.NODE);
+  },
+
+  createTextNode: (text) => {
+    console.warn(`暂时不支持文本节点, 内容为${text}`);
+    return createNode(HOST_TAG.TEXT, text);
+  },
+
+  setTextContent: (node, text) => {
+    // 您的文本设置逻辑
+    setTextContent(node, text);
   },
 
   addEventListener: (node, eventName, callback) => {
@@ -59,9 +66,6 @@ const hostConfig = {
   now: Date.now,
   supportsMutation: true,
   isPrimaryRenderer: false,
-  // isHostComponent: (type) => {
-  //   return type === HOST_TAG.NODE;
-  // },
 
   // 节点创建
   createInstance: (type, props) => {
@@ -163,7 +167,11 @@ const hostConfig = {
   // 关闭不需要的功能
   shouldSetTextContent: () => false,
   createTextInstance: (text) => {
-    return hostEnvironment.createNode(HOST_TAG.TEXT, text);
+    return hostEnvironment.createTextNode(text);
+  },
+  commitTextUpdate: (textInstance, oldText, newText) => {
+    if (oldText === newText) return;
+    hostEnvironment.setTextContent(textInstance, newText);
   },
   supportsConcurrent: false,
 

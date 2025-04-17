@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { HOST_TAG } from "./customReactDOM";
 
@@ -5,6 +7,8 @@ function App() {
   const [count, setCount] = useState(0);
   const [div1Color, setDiv1Color] = useState("#ff0000");
   const [div2Color, setDiv2Color] = useState("#00ff00");
+  const [text, setText] = useState(0);
+
   const div1Flex = useMemo(() => {
     return "#ff0000" === div1Color ? 1.0 : 2.0;
   }, [div1Color])
@@ -44,20 +48,27 @@ function App() {
     }, 1000);
   }, [count]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setText(prevText => prevText + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       <HOST_TAG.NODE></HOST_TAG.NODE>
-      <div style={{ flex: 2.0, margin: 5.0 }} onClick={switchRef}>
-        <div
+      <HOST_TAG.NODE style={{ flex: 2.0, margin: 5.0, flexDirection: "column" }} onClick={switchRef}>
+        <HOST_TAG.NODE
           style={{ flex: div1Flex, margin: 15.0, backgroundColor: div1Color }}
           onClick={handleClick1}
-        ></div>
-        <div
+        ></HOST_TAG.NODE>
+        <HOST_TAG.NODE
           style={{ flex: 1.0, margin: 15.0, backgroundColor: div2Color }}
           onClick={handleClick2}
-        ></div>
-      </div>
-      {count > 0 ? <div>123123</div> : null}
+        ></HOST_TAG.NODE>
+      </HOST_TAG.NODE>
+      {count > 0 ? <>{text}</> : null}
     </>
   );
 }
