@@ -18,7 +18,6 @@ const hostEnvironment = {
   },
 
   createTextNode: (text) => {
-    console.warn(`暂时不支持文本节点, 内容为${text}`);
     return createNode(HOST_TAG.TEXT, text);
   },
 
