@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { HOST_TAG } from "./customReactDOM";
 
@@ -16,14 +14,20 @@ const COLOR_MAP = {
   WHITE: "#ffffff",
 };
 
+const DIV1_COLOR_LIST = [COLOR_MAP.RED, COLOR_MAP.GREEN, COLOR_MAP.BLUE];
+
+type HTMLTag = keyof JSX.IntrinsicElements;
+
 function App() {
   const [count, setCount] = useState(0);
-  const [div1Color, setDiv1Color] = useState(COLOR_MAP.RED);
+  const [colorIndex, setColorIndex] = useState(0);
   const [div2Flex, setDiv2Flex] = useState(1.0);
   const [div3Flex, setDiv3Flex] = useState(1.0);
   const [text, setText] = useState(TEXT_MAP.LOCKED);
 
   const openRef = useRef<boolean>(false);
+
+  const NODE = HOST_TAG.NODE as HTMLTag;
 
   const openColor = useMemo(() => {
     return text === TEXT_MAP.UNLOCKED ? COLOR_MAP.YELLOW : COLOR_MAP.WHITE;
@@ -45,8 +49,8 @@ function App() {
       return;
     }
     console.log("正在切换 div1 的颜色");
-    setDiv1Color(div1Color === COLOR_MAP.RED ? COLOR_MAP.BLUE : COLOR_MAP.RED);
-  }, [div1Color]);
+    setColorIndex((colorIndex) => (colorIndex + 1) % DIV1_COLOR_LIST.length);
+  }, []);
 
   const handleClick2 = useCallback(() => {
     if (!openRef.current) {
@@ -62,7 +66,7 @@ function App() {
       console.log("openRef.current is false, 请打开父级开关");
       return;
     }
-    console.log("正在切换 div3 的颜色");
+    console.log("正在切换 div3 的flex");
     setDiv3Flex(div3Flex === 1.0 ? 2.0 : 1.0);
   }, [div3Flex]);
 
@@ -75,29 +79,28 @@ function App() {
 
   return (
     <>
-      <HOST_TAG.NODE style={{ margin: 10.0 }}>{`HELLO WORLD!`}</HOST_TAG.NODE>
-      <HOST_TAG.NODE
-        style={{ flex: 2.0, margin: 5.0, flexDirection: "column" }}
-      >
-        <HOST_TAG.NODE
+      <NODE style={{ margin: 10.0 }}>{`HELLO WORLD!`}</NODE>
+      <NODE style={{ flex: 2.0, margin: 5.0, flexDirection: "column" }}>
+        <NODE
           style={{ flex: 1.0, margin: 5.0, backgroundColor: openColor }}
           onClick={switchRef}
         >
           {`Click me to switch. It's ${text} now. Now U can ${
             openRef.current ? "" : "not"
           } click Nodes below.`}
-        </HOST_TAG.NODE>
-        <HOST_TAG.NODE
-          style={{ flex: 3.0, margin: 5.0, flexDirection: "column" }}
-        >
-          <HOST_TAG.NODE
-            style={{ margin: 15.0, backgroundColor: div1Color }}
+        </NODE>
+        <NODE style={{ flex: 3.0, margin: 5.0, flexDirection: "column" }}>
+          <NODE
+            style={{
+              margin: 15.0,
+              backgroundColor: DIV1_COLOR_LIST[colorIndex],
+            }}
             onClick={handleClick1}
           >
-            {`Div1 Current Color: ${div1Color}. Click me to change`}
-          </HOST_TAG.NODE>
-          <HOST_TAG.NODE style={{ margin: 5.0 }}>
-            <HOST_TAG.NODE
+            {`Div1 Current Color: ${DIV1_COLOR_LIST[colorIndex]}. Click me to change`}
+          </NODE>
+          <NODE style={{ margin: 5.0 }}>
+            <NODE
               style={{
                 flex: div2Flex,
                 margin: 5.0,
@@ -105,9 +108,9 @@ function App() {
               }}
               onClick={handleClick2}
             >
-              {`Div2 Flex: 1. Click me to change`}
-            </HOST_TAG.NODE>
-            <HOST_TAG.NODE
+              {`Div2 Flex: ${div2Flex}. Click me to change`}
+            </NODE>
+            <NODE
               style={{
                 flex: div3Flex,
                 margin: 5.0,
@@ -116,15 +119,13 @@ function App() {
               onClick={handleClick3}
             >
               {`Div3 Flex: ${div3Flex}. Click me to change`}
-            </HOST_TAG.NODE>
-          </HOST_TAG.NODE>
-        </HOST_TAG.NODE>
-      </HOST_TAG.NODE>
-      <HOST_TAG.NODE
-        style={{ flex: 1.0, margin: 5.0, flexDirection: "column" }}
-      >
+            </NODE>
+          </NODE>
+        </NODE>
+      </NODE>
+      <NODE style={{ flex: 1.0, margin: 5.0, flexDirection: "column" }}>
         {`Start: ${count} seconds`}
-      </HOST_TAG.NODE>
+      </NODE>
     </>
   );
 }
