@@ -14,11 +14,11 @@ const hostEnvironment = {
     if (type !== HOST_TAG.NODE) {
       console.warn(`暂时不支持${type}类型，使用${HOST_TAG.NODE}替代`);
     }
-    return createNode(HOST_TAG.NODE);
+    return createNode();
   },
 
   createTextNode: (text) => {
-    return createNode(HOST_TAG.TEXT, text);
+    return createTextNode(text);
   },
 
   setTextContent: (node, text) => {
